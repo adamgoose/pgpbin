@@ -6,9 +6,7 @@
           <v-col cols="12" sm="8" md="6">
             <v-card class="elevation-12">
               <v-toolbar color="purple" dark flat>
-                <v-toolbar-title>
-                  pgpBin
-                </v-toolbar-title>
+                <v-toolbar-title>pgpBin</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
@@ -21,8 +19,8 @@
                       @click="copyPubkey"
                     >
                       <!-- <v-icon>lock</v-icon> -->
-                      Adam Engebretson &lt;adam.engebretson@instructure.com&gt;<br>
-                      DE75 C21D E9C6 6976 61D8 900E DF15 A302 EA3C 9DCD
+                      Adam Engebretson &lt;adam.engebretson@instructure.com&gt;
+                      <br />DE75 C21D E9C6 6976 61D8 900E DF15 A302 EA3C 9DCD
                     </v-card>
                   </template>
                   <span>Copy Public Key</span>
@@ -73,7 +71,7 @@ export default {
     ...mapState(['pubKey', 'encryptedMessage'])
   },
   methods: {
-    ...mapActions(['encryptMessage']),
+    ...mapActions(['fetchPubKey', 'encryptMessage']),
     encrypt () {
       this.encryptMessage(this.rawMessage)
     },
@@ -88,6 +86,9 @@ export default {
     copyPubkey () {
       this.$copyText(this.pubKey)
     }
+  },
+  mounted () {
+    this.fetchPubKey('/pgp_keys.asc')
   },
   watch: {
     encryptedMessage: function () {

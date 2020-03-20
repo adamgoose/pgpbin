@@ -8,6 +8,11 @@ import './plugins/clipboard2'
 
 Vue.config.productionTip = false
 
+const go = new window.Go()
+window.WebAssembly.instantiateStreaming(fetch('/gpg.wasm'), go.importObject).then((result) => {
+  go.run(result.instance)
+})
+
 new Vue({
   router,
   store,
