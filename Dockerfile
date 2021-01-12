@@ -10,7 +10,9 @@ FROM node:14-alpine as ui-build
 WORKDIR /work
 COPY package.json package-lock.json ./
 RUN npm i
-COPY .browserslintrc .editorconfig .eslintrc.js babel.config.js vue.config.js src public ./
+COPY .browserslistrc .editorconfig .eslintrc.js babel.config.js vue.config.js ./
+COPY src src
+COPY public public
 RUN npm run build
 
 FROM caddy:2.3.0-alpine
