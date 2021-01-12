@@ -22,4 +22,4 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pgpbin:latest
+          tags: adamgoose/pgpbin:latest,adamgoose/pgpbin:${{ github.sha }},adamgoose/pgpbin:${{ github.ref }}
