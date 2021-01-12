@@ -7,6 +7,10 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
+    redirect: '/artisangoose'
+  },
+  {
+    path: '/:username',
     name: 'Sign',
     component: Sign
   }

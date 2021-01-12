@@ -18,9 +18,7 @@
                       hover
                       @click="copyPubkey"
                     >
-                      <!-- <v-icon>lock</v-icon> -->
-                      Adam Engebretson &lt;adam.engebretson@instructure.com&gt;
-                      <br />DE75 C21D E9C6 6976 61D8 900E DF15 A302 EA3C 9DCD
+                      {{ keyName }}<br />{{ keyFingerprint | fingerprint }}
                     </v-card>
                   </template>
                   <span>Copy Public Key</span>
@@ -68,7 +66,7 @@ export default {
     encrypted: false
   }),
   computed: {
-    ...mapState(['pubKey', 'encryptedMessage'])
+    ...mapState(['pubKey', 'keyName', 'keyFingerprint', 'encryptedMessage'])
   },
   methods: {
     ...mapActions(['fetchPubKey', 'encryptMessage']),
@@ -88,7 +86,7 @@ export default {
     }
   },
   mounted () {
-    this.fetchPubKey('/pgp_keys.asc')
+    this.fetchPubKey(`https://keybase.io/${this.$route.params.username}/pgp_keys.asc`)
   },
   watch: {
     encryptedMessage: function () {
@@ -97,6 +95,11 @@ export default {
   },
   props: {
     source: String
+  },
+  filters: {
+    fingerprint (raw) {
+      return (raw.toUpperCase().match(/.{4}/g) || []).join(' ')
+    }
   }
 }
 </script>
