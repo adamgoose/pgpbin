@@ -12,7 +12,7 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="purple" @click="encryptFile" :loading="!!loading">Encrypt File</v-btn>
+      <v-btn color="purple" @click="encryptFile" :loading="!!loading" :disabled="!rawFile">Encrypt File</v-btn>
       <a ref="download" style="display: none;" :href="downloadUrl" :download="downloadName"></a>
     </v-card-actions>
   </div>
@@ -40,8 +40,6 @@ export default {
       const buf = new Uint8Array(await this.rawFile.arrayBuffer())
       await this.encryptMessage(buf)
       this.download()
-      this.loading--
-      this.rawFile = null
     },
     download: function () {
       if (!this.encryptedMessage) { return }
@@ -55,9 +53,14 @@ export default {
       })
 
       setTimeout(() => {
-        this.$set(this, 'downloadUrl', null)
-        window.URL.revokeObjectURL(url)
+        this.cleanup(url)
       }, 1000)
+    },
+    cleanup (url) {
+      this.loading = 0
+      this.rawFile = null
+      this.downloadUrl = null
+      window.URL.revokeObjectURL(url)
     }
   }
 }
