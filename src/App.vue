@@ -23,29 +23,27 @@
                   </template>
                   <span>Copy Public Key</span>
                 </v-tooltip>
+                <template v-slot:extension>
+                  <v-tabs v-model="tab" color="white" fixed-tabs>
+                    <v-tabs-slider></v-tabs-slider>
+
+                    <v-tab key="text">
+                      Text
+                    </v-tab>
+                    <v-tab key="file">
+                      File
+                    </v-tab>
+                  </v-tabs>
+                </template>
               </v-toolbar>
-              <v-card-text>
-                <v-textarea
-                  style="font-family: monospace"
-                  v-model="rawMessage"
-                  outlined
-                  auto-grow
-                  label="Raw Message"
-                  placeholder="Enter a secret message..."
-                ></v-textarea>
-                <v-textarea
-                  style="font-family: monospace"
-                  @click="copy"
-                  v-model="encryptedMessage"
-                  readonly
-                  outlined
-                  label="Encrypted Message"
-                ></v-textarea>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer />
-                <v-btn color="purple" @click="encrypt">Encrypt</v-btn>
-              </v-card-actions>
+              <v-tabs-items v-model="tab">
+                <v-tab-item key="text">
+                  <EncryptText @encrypted="encrypted = true" />
+                </v-tab-item>
+                <v-tab-item key="file">
+                  <EncryptFile />
+                </v-tab-item>
+              </v-tabs-items>
             </v-card>
           </v-col>
         </v-row>
@@ -60,41 +58,25 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import EncryptText from '@/views/Text'
+import EncryptFile from '@/views/File'
 export default {
+  components: { EncryptText, EncryptFile },
   data: () => ({
-    rawMessage: '',
+    tab: 'text',
     encrypted: false
   }),
   computed: {
-    ...mapState(['pubKey', 'keyName', 'keyFingerprint', 'encryptedMessage'])
+    ...mapState(['pubKey', 'keyName', 'keyFingerprint'])
   },
   methods: {
-    ...mapActions(['fetchPubKey', 'encryptMessage']),
-    encrypt () {
-      this.encryptMessage(this.rawMessage)
-    },
-    copy () {
-      if (!this.encryptedMessage) return
-      this.$copyText(this.encryptedMessage)
-      this.encrypted = false
-      this.$nextTick(() => {
-        this.encrypted = true
-      })
-    },
+    ...mapActions(['fetchPubKey']),
     copyPubkey () {
       this.$copyText(this.pubKey)
     }
   },
   mounted () {
     this.fetchPubKey(`https://keybase.io/${this.$route.params.username}/pgp_keys.asc`)
-  },
-  watch: {
-    encryptedMessage: function () {
-      this.copy()
-    }
-  },
-  props: {
-    source: String
   },
   filters: {
     fingerprint (raw) {

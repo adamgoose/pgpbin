@@ -13,13 +13,13 @@ import (
 
 func main() {
 	c := make(chan struct{}, 0)
-	js.Global().Set("enc", js.FuncOf(Encrypt))
-	js.Global().Set("dec", js.FuncOf(Decode))
+	js.Global().Set("enc", js.FuncOf(encrypt))
+	js.Global().Set("dec", js.FuncOf(decode))
 	log.Println("pgp wasm initialized")
 	<-c
 }
 
-func Decode(this js.Value, args []js.Value) interface{} {
+func decode(this js.Value, args []js.Value) interface{} {
 	// Parse the public key
 	e, err := getEntity(this)
 	if err != nil {
@@ -40,7 +40,7 @@ func Decode(this js.Value, args []js.Value) interface{} {
 }
 
 // Encrypt encrypts a message
-func Encrypt(this js.Value, args []js.Value) interface{} {
+func encrypt(this js.Value, args []js.Value) interface{} {
 	// Parse the public key
 	e, err := getEntity(this)
 	if err != nil {
@@ -55,12 +55,14 @@ func Encrypt(this js.Value, args []js.Value) interface{} {
 		log.Println(err)
 		return err.Error()
 	}
-	wc.Write([]byte(args[0].String()))
+	raw := make([]byte, args[0].Length())
+	js.CopyBytesToGo(raw, args[0])
+	wc.Write(raw)
 	wc.Close()
 
 	// Encode with ASCII Armor
-	out := bytes.NewBuffer(nil)
-	wc, err = armor.Encode(out, "PGP MESSAGE", map[string]string{
+	armored := bytes.NewBuffer(nil)
+	wc, err = armor.Encode(armored, "PGP MESSAGE", map[string]string{
 		"Version": "pgpBin 1.0ish",
 		"Comment": "https://pgpbin.enge.me",
 	})
@@ -72,7 +74,7 @@ func Encrypt(this js.Value, args []js.Value) interface{} {
 	wc.Close()
 
 	// et viola
-	return out.String()
+	return armored.String()
 }
 
 func getEntity(pubkey js.Value) (*openpgp.Entity, error) {

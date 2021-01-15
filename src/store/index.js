@@ -39,7 +39,7 @@ export default new Vuex.Store({
     async encryptMessage ({ commit, state }, msg) {
       const enc = window.enc.bind(state.pubKey)
 
-      commit('setEncryptedMessage', enc(msg))
+      await commit('setEncryptedMessage', enc(msg))
     }
   },
   modules: {

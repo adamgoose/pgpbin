@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Sign from '../views/Sign.vue'
 
 Vue.use(VueRouter)
 
@@ -11,8 +10,7 @@ const routes = [
   },
   {
     path: '/:username',
-    name: 'Sign',
-    component: Sign
+    name: 'Text'
   }
 ]
 
